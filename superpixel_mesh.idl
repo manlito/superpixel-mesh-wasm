@@ -1,0 +1,78 @@
+
+[Prefix="superpixel_mesh::"]
+interface MeshingOptions {
+    attribute double target_area;
+    attribute long max_iterations;
+    attribute double regularization;
+    void MeshingOptions();
+};
+
+[Prefix="superpixel_mesh::"]
+interface MeshingIterationProgress {
+    [Value] attribute Mesh mesh;
+    attribute double cost;
+    attribute long iteration;
+    void MeshingIterationProgress();
+};
+
+[Prefix="superpixel_mesh::"]
+interface MeshingIterationCallback {
+    void MeshingIterationCallback();
+    void SetCallback(long callback_pointer);
+    boolean HasCallback();
+    [Const, Ref] MeshingIterationProgress GetIterationProgress();
+};
+
+[Prefix="superpixel_mesh::"]
+interface Image {
+    void Image(long width, long height, octet[] image_data);
+    long Width();
+    long Height();
+    void Blur(long kernel_size, double sigma);
+};
+
+[Prefix="superpixel_mesh::"]
+interface Vertex {
+    attribute double x;
+    attribute double y;
+    void Vertex();
+};
+
+[Prefix="superpixel_mesh::"]
+interface QuadFace {
+    attribute unsigned long tl;
+    attribute unsigned long tr;
+    attribute unsigned long br;
+    attribute unsigned long bl;
+    void QuadFace();
+};
+
+[Prefix="superpixel_mesh::"]
+interface Mesh {
+    void Mesh();
+    unsigned long GetFacesCount();
+    unsigned long GetVerticesCount();
+    [Value] Vertex GetVertexAt(unsigned long vertex_index);
+    [Value] QuadFace GetFaceAt(unsigned long face_index);
+};
+
+[Prefix="superpixel_mesh::"]
+interface MeshingReport {
+    attribute long iterations;
+    attribute double initial_cost;
+    attribute double final_cost;
+    attribute double total_time;
+    void MeshingReport();
+};
+
+[Prefix="superpixel_mesh::"]
+interface SuperpixelsMesh {
+    void SuperpixelsMesh(
+        [Const, Ref] Image image,
+        [Const, Ref] MeshingOptions options);
+    void SetIterationCallback([Ref] MeshingIterationCallback iteration_callback);
+    void SeedSuperpixelsMesh();
+    [Value] Mesh GetMesh();
+    void SetMesh([Const, Ref] Mesh mesh);
+    [Value] MeshingReport OptimizeSuperpixelsMesh();
+};
